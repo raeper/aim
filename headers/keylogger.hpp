@@ -1,6 +1,7 @@
 #include <stdint.h>
-
 #include <windows.h>
+
+#include "virtualkeys.hpp"
 
 namespace raep {
 
