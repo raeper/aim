@@ -1,6 +1,5 @@
+#pragma once
 #include <stdint.h>
-#include <windows.h>
-
 #include "virtualkeys.hpp"
 
 namespace raep {
@@ -10,13 +9,7 @@ namespace raep {
                 {}
 
                 bool onPressed() const {
-                        //LPMSG lpMsg;
-                        //HWND  hWnd;
-                        //UINT  wMsgFilterMin;
-                        //UINT  wMsgFilterMax;
-                        //const auto ret = GetMessage(lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
-                        //return ret;
-                        return bool(GetAsyncKeyState(160) & 1);
+                        return false;
                 }
 
         private:

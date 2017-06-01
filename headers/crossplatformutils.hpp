@@ -1,6 +1,6 @@
 
 namespace raep {
-namespace utils {
+namespace utils {/*
         struct Platform {
                 constexpr Platform& Windows(uint8_t key) {
                         #ifdef _WIN32
@@ -22,7 +22,7 @@ namespace utils {
                 }
 
         uint8_t value;
-};
+};*/
  
 }
 }

@@ -1,59 +1,45 @@
+#pragma once
 #include <functional>
 #include <vector>
 #include <deque>
-
-#include "keylogger.hpp"
+#include <memory>
+#include <unordered_map>
 
 namespace raep {
 
         constexpr std::size_t EVENTS_SIZE_STEP = 1000u;
 
-        using Event_t = int;
-        using Callback_t = std::function<int(void)>;
+        using Callback_t = std::function<void(void)>;
+
+        using EventType_t = std::size_t;
 
         struct Event {
-                Event_t eventType;
-                // std::tuple<...> arguments;
+                EventType_t type;
+        };
+
+        /** \brief Events aggregator
+         */
+        struct IActor {
+                virtual std::vector<Event> exec() = 0;
         };
 
         struct Reactor {
                 Reactor()
                 {
-                        //handlers.resize(EVENTS_SIZE_STEP);
                 }
 
-                void exec()
-                {
-                        /*
-                        while (!finised || hasEvents()) {
-                                for (auto event : events) {
-                                        handlers[event]();
-                                        events.pop_front();
-                                }
+                void exec();
 
-                        }
-                        */
-                        while (!finised) {
-                                if (keylogger.onPressed()) {
-                                        finish();
-                                }
-                        }
+                EventType_t registerActor(std::unique_ptr<IActor> actor) {
+                        actors.emplace_back(std::move(actor));
+                        return actors.size() - 1;
                 }
 
-                bool hasEvents() const {
-                        return !this->events.empty();
-                }
-
-                Event_t registerEvent(Callback_t callback) {
-                        //if (handlers.size() + 1 > handlersCount) {
-                        //        handlers.resize(handlers.size() + EVENTS_SIZE_STEP);
-                        //}
-                        handlers.push_back(callback);
-                        return handlers.size() - 1;
-                }
-
-                void sendEvent(Event_t event) {
-                        events.push_back(event);
+                bool registerHandler(EventType_t eventType, Callback_t callback) {
+                        if (eventType > (actors.size() - 1))
+                                return false;
+                        handlers[eventType] = callback;
+                        return true;
                 }
 
                 void finish() {
@@ -62,9 +48,7 @@ namespace raep {
 
         private:
                 bool finised = false;
-                std::deque<Event_t> events;
-                std::vector<Callback_t> handlers;
-                std::size_t handlersCount;
-                Keylogger keylogger;
+                std::vector<std::unique_ptr<IActor>> actors;
+                std::unordered_map<EventType_t, Callback_t> handlers;
         };
 }
