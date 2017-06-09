@@ -1,15 +1,10 @@
+#include <thread>
+#include <chrono>
 #include "reactor.hpp"
 
-void raep::Reactor::exec() {
-        while (!finised && !actors.empty()) {
-                // TODO make actors execution async
-                for (auto i = 0; i < actors.size(); ++i) {
-                        for (auto& event : actors[i]->exec()) {
-                                // TODO somehow pass arguments to handler?
-                                auto handlerItr = handlers.find(i);
-                                if (handlerItr != handlers.end())
-                                        handlerItr->second();
-                        }
-                }
+
+void raep::EventsDispenser::operator()() {
+        while (!this->finised) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
 }

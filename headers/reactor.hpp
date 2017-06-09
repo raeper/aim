@@ -4,51 +4,57 @@
 #include <deque>
 #include <memory>
 #include <unordered_map>
+#include <map>
+
+#include "lockable.hpp"
+
 
 namespace raep {
 
         constexpr std::size_t EVENTS_SIZE_STEP = 1000u;
 
-        using Callback_t = std::function<void(void)>;
+        using EventArguments_t = std::function<void(void)>;
 
-        using EventType_t = std::size_t;
-
-        struct Event {
-                EventType_t type;
+        enum class EventType : std::size_t {
+                InputEvent,
+                ControlEvent
         };
 
-        /** \brief Events aggregator
+        /*! \brief Basic class for events aggregator.
+         * Can collect only one type of events. Lives in separate thread.
          */
-        struct IActor {
-                virtual std::vector<Event> exec() = 0;
+        struct IEventsAggregator {
+                /*! \brief Main aggregator procedure.
+                 */
+                virtual void exec() = 0;
         };
 
-        struct Reactor {
-                Reactor()
+        struct EventsDispenser {
+                EventsDispenser()
                 {
                 }
 
-                void exec();
+                ~EventsDispenser() {
 
-                EventType_t registerActor(std::unique_ptr<IActor> actor) {
-                        actors.emplace_back(std::move(actor));
-                        return actors.size() - 1;
                 }
 
-                bool registerHandler(EventType_t eventType, Callback_t callback) {
-                        if (eventType > (actors.size() - 1))
-                                return false;
-                        handlers[eventType] = callback;
-                        return true;
+                /*! \brief Register event aggregator.
+                 * \param type Event type group.
+                 * \param value Event aggregator.
+                 */
+                void registerAggregator(const EventType type, std::unique_ptr<IEventsAggregator> value) {
+                        //eventsAggregators[type] = std::move(value);
                 }
 
                 void finish() {
                         finised = !finised;
                 }
 
+                void operator()();
+
         private:
                 bool finised = false;
-                std::vector<std::unique_ptr<IActor>> actors;
-                std::unordered_map<EventType_t, Callback_t> handlers;
+                //std::map<EventType, Lockable<std::deque<EventArguments_t>>> eventsBus;
+                std::map<EventType, Lockable<std::deque<int>>> eventsBus;
         };
 }

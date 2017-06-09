@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <thread>
 
 #include "reactor.hpp"
 #include "ioactor.hpp"
@@ -11,18 +12,12 @@ namespace raep {
 
                 int run()
                 {
-                        auto inputActor = std::unique_ptr<IActor>(new InputActor());
-                        const auto inputEventType = reactor.registerActor(std::move(inputActor));
-
-                        reactor.registerHandler(inputEventType, [this]() {
-                                reactor.finish();
-                        });
-
-                        reactor.exec();
+                        std::thread eventLoopThread(dispenser);
+                        eventLoopThread.join();
                         return 0;
                 }
 
         private:
-                Reactor reactor;
+                EventsDispenser dispenser;
         };
 }

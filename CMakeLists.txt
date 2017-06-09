@@ -13,4 +13,4 @@ include_directories(${CMAKE_SOURCE_DIR}/headers)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g")
 
 add_executable(aim ${SOURCES} ${HEADERS})
-set_property(TARGET aim PROPERTY CXX_STANDARD 11)
+set_property(TARGET aim PROPERTY CXX_STANDARD 14)
