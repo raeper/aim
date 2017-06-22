@@ -6,7 +6,7 @@ project(AIM)
 set(SOURCES
     ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/reactor.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/events_dispenser.cpp)
 
 include_directories(${CMAKE_SOURCE_DIR}/headers)
 
