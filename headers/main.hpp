@@ -5,7 +5,7 @@
 #include "reactor.hpp"
 #include "ioactor.hpp"
 
-namespace raep {
+namespace aim {
         struct Application {
                 Application()
                 {}

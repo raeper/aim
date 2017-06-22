@@ -1,10 +1,10 @@
 #include <thread>
 #include <chrono>
-#include "reactor.hpp"
+#include "events_dispenser.hpp"
 
 
-void raep::EventsDispenser::operator()() {
+void aim::EventsDispenser::operator()() {
         while (!this->finised) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                //std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
 }

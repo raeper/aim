@@ -1,6 +1,6 @@
 #include <mutex>
 
-namespace raep {
+namespace aim {
 
         template <typename T>
         struct Lockable {

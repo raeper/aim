@@ -1,11 +1,11 @@
 #pragma once
-#include "reactor.hpp"
+#include "events_dispenser.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-namespace raep {
+namespace aim {
         struct InputEventAggregator : IEventsAggregator {
                 virtual void exec() override {
 #ifdef _WIN32

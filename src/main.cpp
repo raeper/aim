@@ -3,6 +3,6 @@
 #include "main.hpp"
 
 int main() {
-        auto app = raep::Application();
+        auto app = aim::Application();
         return app.run();
 }

@@ -4,12 +4,11 @@
 #include <deque>
 #include <memory>
 #include <unordered_map>
-#include <map>
 
 #include "lockable.hpp"
 
 
-namespace raep {
+namespace aim {
 
         constexpr std::size_t EVENTS_SIZE_STEP = 1000u;
 
@@ -43,7 +42,7 @@ namespace raep {
                  * \param value Event aggregator.
                  */
                 void registerAggregator(const EventType type, std::unique_ptr<IEventsAggregator> value) {
-                        //eventsAggregators[type] = std::move(value);
+                        eventsAggregators[type] = std::move(value);
                 }
 
                 void finish() {
@@ -54,7 +53,8 @@ namespace raep {
 
         private:
                 bool finised = false;
-                //std::map<EventType, Lockable<std::deque<EventArguments_t>>> eventsBus;
-                std::map<EventType, Lockable<std::deque<int>>> eventsBus;
+                std::unordered_map<EventType, Lockable<std::deque<std::any>>> eventsBus;
+                std::unordered_map<EventType, std::unique_ptr<IEventsAggregator>> eventsAggregators;
+                std::unordered_map<EventType, std::vector<int>> subscribers; // TODO
         };
 }
