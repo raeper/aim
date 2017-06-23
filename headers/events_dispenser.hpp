@@ -1,11 +1,11 @@
 #pragma once
 #include <functional>
 #include <vector>
-#include <deque>
 #include <memory>
 #include <unordered_map>
 
-#include "lockable.hpp"
+#include "mutex_lock.hpp"
+#include "queue.hpp"
 
 
 namespace aim {
@@ -53,7 +53,8 @@ namespace aim {
 
         private:
                 bool finised = false;
-                std::unordered_map<EventType, Lockable<std::deque<std::any>>> eventsBus;
+
+                std::unordered_map<EventType, MutexLock<Queue_t<std::any>> eventsBus;
                 std::unordered_map<EventType, std::unique_ptr<IEventsAggregator>> eventsAggregators;
                 std::unordered_map<EventType, std::vector<int>> subscribers; // TODO
         };
