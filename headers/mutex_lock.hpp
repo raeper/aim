@@ -3,41 +3,33 @@
 
 namespace aim {
 
-        template <typename T>
-        struct MutexLock {
+        template <typename MutexType, typename T>
+        struct IMutexLock {
+                using mutex_t = MutexType;
                 using value_type = typename T::value_type;
                 using container_type = T;
 
-                MutexLock()
+                IMutexLock()
                 {}
 
-                MutexLock(const MutexLock&) = delete;
+                IMutexLock(const IMutexLock&) = delete;
 
                 value_type read() {
-                        mutex.lock();
+                        std::lock_guard<mutex_t> lock(mutex);
                         auto result = container.pop();
-                        mutex.unlock();
                         return result;
                 }
 
                 void write(value_type&& value) {
-                        mutex.lock();
+                        std::lock_guard<mutex_t> lock(mutex);
                         container.push(std::move(value));
-                        mutex.unlock();
-                }
-
-                value_type read_keep_lock() {
-                        mutex.lock();
-                        return container.pop();
-                }
-
-                void write_locked(value_type&& value) {
-                        container.push(std::move(value));
-                        mutex.unlock();
                 }
 
         private:
-                std::mutex mutex;
+                mutex_t mutex;
                 container_type container;
         };
+
+        template <typename T>
+        using MutexLock = IMutexLock<std::mutex, T>;
 }
