@@ -1,18 +1,15 @@
 sudo: required
-dist: trusty
 language: cpp
 compiler:
-   - clang
+   - gcc
+
 addons:
-   apt:
-      packages:
-         - clang-3.9
-         - libc++-dev
-      sources:
-         - ubuntu-toolchain-r-test
-         - llvm-toolchain-precise
-         - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main'
-           key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
+  apt:
+    packages:
+      - valgrind
+      - g++-6
+    sources: &sources
+      - ubuntu-toolchain-r-test
 script:
    - mkdir build
    - cd build
