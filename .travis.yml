@@ -1,15 +1,24 @@
 sudo: required
-language: cpp
-compiler:
-   - gcc
+dist: trusty
 
-addons:
-  apt:
-    packages:
-      - valgrind
-      - g++-6
-    sources: &sources
-      - ubuntu-toolchain-r-test
+language: cpp
+
+services: docker
+
+notifications:
+  recipients: berkus@metta.systems
+  email:
+    on_success: change
+    on_failure: always
+
+matrix:
+  include:
+    - os: linux
+      env: BUILD_TYPE=Debug
+
+before_install:
+  - docker pull berkus/docker-cpp-ci:latest
+
 script:
    - mkdir build
    - cd build
