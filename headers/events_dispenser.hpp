@@ -55,7 +55,7 @@ namespace aim {
         private:
                 bool finised = false;
 
-                std::unordered_map<EventType, MutexLock<Queue_t<std::any>> eventsBus;
+                std::unordered_map<EventType, MutexLock<Queue_t<std::any>>> eventsBus;
                 std::unordered_map<EventType, std::unique_ptr<IEventsAggregator>> eventsAggregators;
                 std::unordered_map<EventType, std::vector<int>> subscribers; // TODO
         };
