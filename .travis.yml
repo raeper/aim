@@ -21,5 +21,5 @@ before_install:
 
 script:
   - mkdir _build_
-  - docker run --rm -v $PWD:/repo -v ~/.travis:/travis chpoker/docker-cpp-ci /bin/sh -c "cd /repo/_build_; CC=clang CXX=clang++ cmake -G Ninja -DTRAVIS_CI=YES -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON ..; cmake --build ."
+  - docker run --rm -v $PWD:/repo -v ~/.travis:/travis chpoker/docker-cpp-ci /bin/sh -c "cd /repo/_build_; CC=gcc CXX=g++ cmake -G Ninja -DTRAVIS_CI=YES -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON ..; cmake --build ."
 
