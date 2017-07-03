@@ -17,9 +17,9 @@ matrix:
       env: BUILD_TYPE=Debug
 
 before_install:
-  - docker pull berkus/docker-cpp-ci:latest
+  - docker pull chpoker/docker-cpp-ci:latest
 
 script:
   - mkdir _build_
-  - docker run --rm -v $PWD:/repo -v chpoker/docker-cpp-ci /bin/sh -c "cd /repo/_build_; CC=clang CXX=clang++ cmake -G Ninja -DTRAVIS_CI=YES -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON ..; cmake --build .; ASAN_OPTIONS=alloc_dealloc_mismatch=0 ctest"
+  - docker run --rm -v $PWD:/repo -v ~/.travis:/travis chpoker/docker-cpp-ci /bin/sh -c "cd /repo/_build_; CC=clang CXX=clang++ cmake -G Ninja -DTRAVIS_CI=YES -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON ..; cmake --build .; ASAN_OPTIONS=alloc_dealloc_mismatch=0 ctest"
 
