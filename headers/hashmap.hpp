@@ -51,8 +51,8 @@ namespace aim {
                  * \param func Function object takes type `pair_t` type as argument.
                  */
                 template <typename Func>
-                void iter(Func func) const {
-                        for(const auto& node : data_)
+                void iter(Func&& func) const {
+                        for(auto&& node : data_)
                                 func(node);
                 }
 
