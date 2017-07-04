@@ -145,13 +145,8 @@ namespace aim {
                                 else if (itr_hash > hash_) {
                                         right = itr;
                                 }
-                                else if (itr_hash == hash_) {
-                                        result.found = true;
-                                        result.itr = itr;
-                                        searching = false;
-                                }
                                 else {
-                                        result.found = false;
+                                        result.found = true;
                                         result.itr = itr;
                                         searching = false;
                                 }
