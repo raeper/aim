@@ -151,7 +151,7 @@ namespace aim {
                                         searching = false;
                                 }
                                 else {
-                                        result.found = true;
+                                        result.found = false;
                                         result.itr = itr;
                                         searching = false;
                                 }
