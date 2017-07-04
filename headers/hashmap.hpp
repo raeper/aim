@@ -5,6 +5,7 @@
 #include <tuple>
 #include <iterator>
 #include <initializer_list>
+#include <algorithm>
 
 namespace aim {
 
@@ -85,7 +86,7 @@ namespace aim {
                         }
                         else {
                                 auto iter = own.itr;
-                                std::advance(iter, 1);
+                                //std::advance(iter, 1);
                                 data_.insert(iter, std::make_tuple(hash_, value));
                                 return true;
                         }
@@ -118,40 +119,14 @@ namespace aim {
                  * \param hash_ Key's hash.
                  */
                 search_result _find(const hash_t hash_) {
-                        auto left = begin();
-                        auto right = end();
-                        bool searching = true;
+                        auto itr = std::lower_bound(begin(), end(), std::make_tuple(hash_, value_t{}), [](auto l, auto r) {
+                                return std::get<0>(l) < std::get<0>(r);
+                        });
 
-                        auto result = search_result{false, right};
-
-                        while (searching) {
-                                const std::size_t dist = std::distance(left, right) / 2;
-
-                                auto itr = left;
-
-                                if (dist == 0) {
-                                        result.found = false;
-                                        result.itr = itr;
-                                        break;
-                                }
-
-                                std::advance(itr, dist);
-
-                                const auto itr_hash = std::get<0>(*itr);
-
-                                if (itr_hash < hash_) {
-                                        left = itr;
-                                }
-                                else if (itr_hash > hash_) {
-                                        right = itr;
-                                }
-                                else {
-                                        result.found = true;
-                                        result.itr = itr;
-                                        searching = false;
-                                }
+                        if (itr != end() && std::get<0>(*itr) == hash_) {
+                                return {true, itr};
                         }
-                        return result;
+                        return {false, itr};
                 }
 
                 data_t data_;
