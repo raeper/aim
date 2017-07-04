@@ -14,8 +14,9 @@ namespace aim {
         struct hash_map {
                 using key_t = KeyT;
                 using value_t = ValueT;
-                using pair_t = std::tuple<std::size_t, value_t>;
                 using hash_fn = std::hash<key_t>;
+                using hash_t = decltype(hash_fn{}(std::declval<key_t>()));
+                using pair_t = std::tuple<hash_t, value_t>;
 
                 using data_t = std::vector<pair_t>;
                 using iterator = typename data_t::iterator;
@@ -116,7 +117,7 @@ namespace aim {
                 /** \brief Searches element by its key's hash.
                  * \param hash_ Key's hash.
                  */
-                search_result _find(const std::size_t hash_) {
+                search_result _find(const hash_t hash_) {
                         auto left = begin();
                         auto right = end();
                         bool searching = true;
