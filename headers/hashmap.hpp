@@ -58,7 +58,7 @@ namespace aim {
                                 func(node);
                 }
 
-                /** |brief Find existing element or return past-end element iterator.
+                /** \brief Find existing element or return past-end element iterator.
                  */
                 iterator find(const key_t& key) {
                         const auto hash_ = hash_fn{}(key);
@@ -77,17 +77,16 @@ namespace aim {
                  * \param value New value.
                  * \return New element was created or reassigned to existing key.
                  */
-                bool insert(const key_t& key, const value_t& value) {
+                bool insert(const key_t& key, value_t&& value) {
                         const auto hash_ = hash_fn{}(key);
                         const auto& own = _find(hash_);
                         if (own.found) {
-                                std::get<1>(*own.itr) = value;
+                                std::get<1>(*own.itr) = std::move(value);
                                 return false;
                         }
                         else {
                                 auto iter = own.itr;
-                                //std::advance(iter, 1);
-                                data_.insert(iter, std::make_tuple(hash_, value));
+                                data_.insert(iter, std::make_tuple(hash_, std::move(value)));
                                 return true;
                         }
                 }
@@ -119,7 +118,8 @@ namespace aim {
                  * \param hash_ Key's hash.
                  */
                 search_result _find(const hash_t hash_) {
-                        auto itr = std::lower_bound(begin(), end(), std::make_tuple(hash_, value_t{}), [](auto l, auto r) {
+                        auto itr = std::lower_bound(begin(), end(), std::make_tuple(hash_, value_t{}),
+                        [](const auto& l, const auto& r) {
                                 return std::get<0>(l) < std::get<0>(r);
                         });
 

@@ -2,11 +2,11 @@
 #include <functional>
 #include <vector>
 #include <memory>
-#include <unordered_map>
 #include <any>
 
 #include "mutex_lock.hpp"
 #include "queue.hpp"
+#include "hashmap.hpp"
 
 
 namespace aim {
@@ -24,6 +24,14 @@ namespace aim {
          * Can collect only one type of events. Lives in separate thread.
          */
         struct IEventsAggregator {
+
+                IEventsAggregator()
+                {}
+
+                IEventsAggregator(const IEventsAggregator&) = default;
+                IEventsAggregator(IEventsAggregator&&) = default;
+                ~IEventsAggregator() = default;
+
                 /*! \brief Main aggregator procedure.
                  */
                 virtual void exec() = 0;
@@ -31,12 +39,13 @@ namespace aim {
 
         struct EventsDispenser {
                 EventsDispenser()
-                {
-                }
+                {}
 
-                ~EventsDispenser() {
+                EventsDispenser(EventsDispenser&&) = default;
+                EventsDispenser(const EventsDispenser&) = delete;
 
-                }
+                ~EventsDispenser()
+                {}
 
                 /*! \brief Register event aggregator.
                  * \param type Event type group.
@@ -44,6 +53,7 @@ namespace aim {
                  */
                 void registerAggregator(const EventType type, std::unique_ptr<IEventsAggregator> value) {
                         //eventsAggregators[type] = std::move(value);
+                        eventsAggregators.insert(type, std::move(value));
                 }
 
                 void finish() {
@@ -55,8 +65,8 @@ namespace aim {
         private:
                 bool finised = false;
 
-                //std::unordered_map<EventType, MutexLock<Queue_t<std::any>>> eventsBus;
-                //std::unordered_map<EventType, std::unique_ptr<IEventsAggregator>> eventsAggregators;
-                //std::unordered_map<EventType, std::vector<int>> subscribers; // TODO
+                hash_map<EventType, std::unique_ptr<IEventsAggregator>> eventsAggregators;
+                hash_map<EventType, MutexLock<Queue_t<std::any>>> eventsBus;
+                hash_map<EventType, std::vector<int>> subscribers;
         };
 }

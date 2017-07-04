@@ -12,12 +12,9 @@ namespace aim {
 
                 int run()
                 {
-                        std::thread eventLoopThread(dispenser);
+                        std::thread eventLoopThread(EventsDispenser{});
                         eventLoopThread.join();
                         return 0;
                 }
-
-        private:
-                EventsDispenser dispenser;
         };
 }
