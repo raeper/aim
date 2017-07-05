@@ -52,7 +52,6 @@ namespace aim {
                  * \param value Event aggregator.
                  */
                 void registerAggregator(const EventType type, std::unique_ptr<IEventsAggregator> value) {
-                        //eventsAggregators[type] = std::move(value);
                         eventsAggregators.insert(type, std::move(value));
                 }
 
