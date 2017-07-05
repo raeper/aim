@@ -26,9 +26,11 @@ namespace aim {
                 hash_map()
                 {}
 
-                hash_map(std::initializer_list<pair_t> other)
-                : data_(other)
-                {}
+                hash_map(std::initializer_list<std::tuple<key_t, value_t>> other)
+                {
+                        for(auto&& item : other)
+                                insert(std::get<0>(item), std::get<1>(item));
+                }
 
                 hash_map(const hash_map&) = default;
                 hash_map(hash_map&&) = default;
