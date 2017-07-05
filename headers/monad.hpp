@@ -2,6 +2,13 @@
 #include <optional>
 
 namespace aim {
+
+        template <typename T>
+        struct chain;
+
+        template <typename T, typename Func>
+        constexpr auto use(std::optional<T>&& value, Func&& func) -> chain<T>;
+
         template <typename T>
         struct chain {
                 using value_type_t = T;
@@ -19,6 +26,11 @@ namespace aim {
                 constexpr auto otherwise(Func&& func) {
                         return chain<T>(std::move(func()));
                 }
+
+                template <typename Func>
+                constexpr auto use(Func&& func) {
+                        return aim::use(std::move(value), std::move(func));
+                }
         };
         
         template <typename T, typename Func>
@@ -31,33 +43,21 @@ namespace aim {
                         return chain<T>{std::move(value)};
                 }
         }
-
-        template <typename T, typename Func>
-        constexpr auto operator >> (chain<T>&& left, Func&& func) -> chain<T> {
-                return use(std::move(left.value), std::move(func));
-        }
-
-        template <typename T, typename Func>
-        constexpr auto operator || (chain<T>&& left, Func&& func) {
-                return left.otherwise(std::move(func));
-        }
 }
 
 // #include <iostream>
 
 // int main() {
 //         std::optional<int> a;
+
 //         aim::use(std::move(a), [](auto v) {
 //                 std::cout << v << '\n';
 //                 return 1;
-//         }).otherwise([]() {
-//                 std::cout << "It's none!\n";
+//         }).otherwise([] {
+//                 std::cout << 2 << '\n';
 //                 return 2;
-//         }) >> [](auto x) {
-//                 std::cout << x << '\n';
+//         }).use([](auto v) {
+//                 std::cout << v << '\n';
 //                 return 3;
-//         } || [] () {
-//                 std::cout << "It's none again!\n";
-//                 return 4;
-//         };
+//         });
 // }
