@@ -1,63 +1,77 @@
-#pragma once
-#include <optional>
+#include <utility>
 
 namespace aim {
 
-        template <typename T>
+        template <typename T, template <typename> typename Cont>
+        struct is_valid {};
+
+        template <typename T, template <typename> typename Cont>
         struct chain;
 
-        template <typename T, typename Func>
-        constexpr auto use(std::optional<T>&& value, Func&& func) -> chain<T>;
-
-        template <typename T>
-        struct chain {
+        template <typename T, template <typename> typename Cont>
+        struct use {
                 using value_type_t = T;
-                using containter_type_t = std::optional<value_type_t>;
-                containter_type_t value;
+                using holder_t = Cont<value_type_t>;
 
-                chain()
+                use()
                 {}
 
-                chain(containter_type_t&& value_)
-                : value(std::move(value_))
+                use(holder_t&& value)
+                : value(std::move(value))
                 {}
 
+                template <typename Func>
+                constexpr auto with(Func&& func){
+                        using subresult_type_t = decltype(func(std::declval<value_type_t>()));
+                        if (is_valid<T, Cont>{}(value)) {
+                                return chain<subresult_type_t, Cont>{Cont<subresult_type_t>{func(*value)}};
+                        }
+                        else {
+                                return chain<subresult_type_t, Cont>{};
+                        }
+                }
+
+                holder_t value;
+        };
+
+        template <typename TT, template <typename> typename ContT>
+        struct chain : use<TT, ContT> {
                 template <typename Func>
                 constexpr auto otherwise(Func&& func) {
-                        return chain<T>(std::move(func()));
-                }
-
-                template <typename Func>
-                constexpr auto use(Func&& func) {
-                        return aim::use(std::move(value), std::move(func));
+                        return chain<TT, ContT>{ContT<decltype(func())>{func()}};
                 }
         };
-        
-        template <typename T, typename Func>
-        constexpr auto use(std::optional<T>&& value, Func&& func) -> chain<T> {
-                if (bool(value)) {
-                        func(std::move(*value));
-                        return chain<T>{};
-                }
-                else {
-                        return chain<T>{std::move(value)};
-                }
-        }
+
 }
 
+// #include <optional>
+
+// namespace aim {
+//         template <typename T>
+//         struct is_valid<T, std::optional> {
+//                 constexpr bool operator()(std::optional<T> const& value) {
+//                         return bool(value);
+//                 }
+//         };
+// }
+
 // #include <iostream>
+// #include <memory>
 
 // int main() {
-//         std::optional<int> a;
 
-//         aim::use(std::move(a), [](auto v) {
-//                 std::cout << v << '\n';
-//                 return 1;
-//         }).otherwise([] {
-//                 std::cout << 2 << '\n';
-//                 return 2;
-//         }).use([](auto v) {
-//                 std::cout << v << '\n';
-//                 return 3;
-//         });
+//         {
+//                 std::optional<int> a;
+
+//                 aim::use(std::move(a)).with([](auto v) {
+//                         std::cout << v << '\n';
+//                         return 1;
+//                 }).otherwise([](){
+//                         std::cout << "it's none!\n";
+//                         return 2;
+//                 }).with([](auto v){
+//                         std::cout <<  v << '\n';
+//                         return 3;
+//                 });
+//         }
 // }
