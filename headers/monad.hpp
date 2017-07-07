@@ -1,4 +1,23 @@
 #pragma once
+/** Tools for creating monadic chained expressions.
+ * Example of usage:
+ * \code{.cpp}
+ *         aim::hash_map<int, int> map = {
+ *                 {1, 1}, {2, 2}
+ *         };
+ *         const auto final_result = aim::use(std::move(map.find(1))).with([](auto value) {
+ *                 std::cout << value << '\n';
+ *                 return value * 2;
+ *         }).otherwise([]{
+ *                std::cout << "Map doesn't have key!\n";
+ *                return 2;
+ *         });
+ *         // To access the final value:
+ *         const auto value_container = final_result.value.get();
+ *         // Resulting container is always has value due to non-void otherwise block.
+ * \code
+ *
+ */
 #include <utility>
 #include <memory>
 #include <optional>
@@ -9,7 +28,10 @@ namespace aim {
         struct is_valid {};
 
         template <typename T, template <typename...> typename Cont>
-        struct make {};
+        struct wrap {};
+
+        template <typename T, template <typename...> typename Cont>
+        struct unwrap {};
 
         template <typename T, template <typename...> typename Cont>
         struct chain;
@@ -30,7 +52,7 @@ namespace aim {
                 constexpr auto with(Func&& func){
                         using subresult_type_t = decltype(func(std::declval<value_type_t>()));
                         if (is_valid<T, Cont>{}(value)) {
-                                return chain<subresult_type_t, Cont>{make<subresult_type_t, Cont>{}(std::move(func(*value)))};
+                                return chain<subresult_type_t, Cont>{wrap<subresult_type_t, Cont>{}(std::move(func(*value)))};
                         }
                         else {
                                 return chain<subresult_type_t, Cont>{};
@@ -44,10 +66,19 @@ namespace aim {
         struct chain : use<TT, ContT> {
                 template <typename Func>
                 constexpr auto otherwise(Func&& func) {
-                        return chain<TT, ContT>{make<decltype(func()), ContT>{}(func())};
+                        return chain<TT, ContT>{wrap<decltype(func()), ContT>{}(func())};
                 }
         };
 
+        template <typename T, template <typename...> typename Cont>
+        auto lift(chain<T, Cont>&& value) {
+                return unwrap<T, Cont>{}(std::move(value.value));
+        }
+
+        template <typename T, template <typename...> typename Cont>
+        auto operator << (T& left, chain<T, Cont>&& right) {
+                left = lift(std::move(right));
+        }
 }
 
 namespace aim {
@@ -59,9 +90,16 @@ namespace aim {
         };
 
         template <typename T>
-        struct make<T, std::optional> {
+        struct wrap<T, std::optional> {
                 auto operator()(T&& value) {
                         return std::optional{std::move(value)};
+                }
+        };
+
+        template <typename T>
+        struct unwrap<T, std::optional> {
+                auto operator()(std::optional<T>&& value) {
+                        return *value;
                 }
         };
 }
@@ -75,9 +113,16 @@ namespace aim {
         };
 
         template <typename T>
-        struct make<T, std::unique_ptr> {
+        struct wrap<T, std::unique_ptr> {
                 auto operator()(T&& value) {
                         return std::make_unique<T>(std::move(value));
+                }
+        };
+
+        template <typename T>
+        struct unwrap<T, std::unique_ptr> {
+                auto operator()(std::unique_ptr<T>&& value) {
+                        return *value;
                 }
         };
 }
