@@ -6,7 +6,7 @@
 #endif
 
 namespace aim {
-        struct InputEventAggregator : IEventsAggregator {
+        struct InputEventProducer : IEventsProducer {
                 virtual void exec() override {
 #ifdef _WIN32
                         LPMSG lpMsg;

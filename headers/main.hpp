@@ -12,8 +12,7 @@ namespace aim {
 
                 int run()
                 {
-                        std::thread eventLoopThread(EventsDispenser{});
-                        eventLoopThread.join();
+                        EventsDispenser{}();
                         return 0;
                 }
         };

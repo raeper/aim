@@ -7,6 +7,8 @@
 #include <initializer_list>
 #include <algorithm>
 
+#include "monad.hpp"
+
 namespace aim {
 
         /** Ordered hash map
@@ -66,6 +68,12 @@ namespace aim {
                         const auto hash_ = hash_fn{}(key);
                         auto res_ = _find(hash_);
                         return res_.found ? res_.itr : end();
+                }
+
+                auto mfind(key_t const& key) {
+                        const auto hash_ = hash_fn{}(key);
+                        auto res_ = _find(hash_);
+                        return res_.found ? std::optional<value_t>{*res_.itr} : std::optional<value_t>{};
                 }
 
                 /** |brief Find existing element or return past-end element iterator.

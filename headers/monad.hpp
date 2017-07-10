@@ -91,14 +91,14 @@ namespace aim {
 
         template <typename T>
         struct wrap<T, std::optional> {
-                auto operator()(T&& value) {
+                constexpr auto operator()(T&& value) {
                         return std::optional{std::move(value)};
                 }
         };
 
         template <typename T>
         struct unwrap<T, std::optional> {
-                auto operator()(std::optional<T>&& value) {
+                constexpr auto operator()(std::optional<T>&& value) {
                         return *value;
                 }
         };
@@ -114,14 +114,14 @@ namespace aim {
 
         template <typename T>
         struct wrap<T, std::unique_ptr> {
-                auto operator()(T&& value) {
+                constexpr auto operator()(T&& value) {
                         return std::make_unique<T>(std::move(value));
                 }
         };
 
         template <typename T>
         struct unwrap<T, std::unique_ptr> {
-                auto operator()(std::unique_ptr<T>&& value) {
+                constexpr auto operator()(std::unique_ptr<T>&& value) {
                         return *value;
                 }
         };

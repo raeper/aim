@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <any>
+#include <atomic>
 
 #include "mutex_lock.hpp"
 #include "queue.hpp"
@@ -11,61 +12,47 @@
 
 namespace aim {
 
-        constexpr std::size_t EVENTS_SIZE_STEP = 1000u;
+        struct IEventsProducer {
 
-        using EventArguments_t = std::function<void(void)>;
-
-        enum class EventType : std::size_t {
-                InputEvent,
-                ControlEvent
-        };
-
-        /*! \brief Basic class for events aggregator.
-         * Can collect only one type of events. Lives in separate thread.
-         */
-        struct IEventsAggregator {
-
-                IEventsAggregator()
+                IEventsProducer()
                 {}
 
-                IEventsAggregator(const IEventsAggregator&) = default;
-                IEventsAggregator(IEventsAggregator&&) = default;
-                ~IEventsAggregator() = default;
+                IEventsProducer(const IEventsProducer&) = default;
+                IEventsProducer(IEventsProducer&&) = default;
+                ~IEventsProducer() = default;
 
-                /*! \brief Main aggregator procedure.
-                 */
                 virtual void exec() = 0;
+
+                void operator()(std::atomic_bool& finised) {
+                        while (!finised.load(std::memory_order::memory_order_relaxed)) {
+                                this->exec();
+                        }
+                }
+        };
+
+        /*! \brief Events subsriber
+         * \warning Can modify state of EventsDispenser: finished or not.
+         */
+        struct IEvenetsSubscriber {
+
         };
 
         struct EventsDispenser {
+
                 EventsDispenser()
                 {}
 
                 EventsDispenser(EventsDispenser&&) = default;
                 EventsDispenser(const EventsDispenser&) = delete;
 
-                ~EventsDispenser()
+                virtual ~EventsDispenser()
                 {}
 
-                /*! \brief Register event aggregator.
-                 * \param type Event type group.
-                 * \param value Event aggregator.
-                 */
-                void registerAggregator(const EventType type, std::unique_ptr<IEventsAggregator> value) {
-                        eventsAggregators.insert(type, std::move(value));
-                }
-
-                void finish() {
-                        finised = !finised;
-                }
-
-                void operator()();
+                void operator()(std::vector<IEventsProducer>&& producers, std::vector<IEvenetsSubscriber>&& subscribers);
 
         private:
-                bool finised = false;
+                std::atomic_bool finised = false;
 
-                hash_map<EventType, std::unique_ptr<IEventsAggregator>> eventsAggregators;
-                hash_map<EventType, MutexLock<Queue_t<std::any>>> eventsBus;
-                hash_map<EventType, std::vector<int>> subscribers;
+                MutexLock<Queue_t<std::any>> eventsBus;
         };
 }
