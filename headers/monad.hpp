@@ -1,5 +1,5 @@
 #pragma once
-/** Tools for creating monadic chained expressions.
+/** Tools to create monadic chained expressions.
  * Example of usage:
  * \code{.cpp}
  *         aim::hash_map<int, int> map = {
@@ -14,7 +14,7 @@
  *         });
  *         // To access the final value:
  *         const auto value_container = final_result.value.get();
- *         // Resulting container is always has value due to non-void otherwise block.
+ *         // Resulting container always has value due to non-void otherwise block.
  * \code
  *
  */
