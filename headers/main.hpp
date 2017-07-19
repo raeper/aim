@@ -12,7 +12,7 @@ namespace aim {
 
                 int run()
                 {
-                        EventsDispenser{}();
+                        //EventsDispenser{}();
                         return 0;
                 }
         };
